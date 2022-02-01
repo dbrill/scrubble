@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Board from './components/Board';
 import Keyboard from './components/Keyboard';
+import Alphabet from './util/Alphabet';
 
 type Props = {}
 type State = {
@@ -22,20 +23,29 @@ class App extends Component<Props, State> {
       guessIndex: 0
     };
 
-    this.addChar = this.addChar.bind(this);
+    this._handleKeyboardChar = this._handleKeyboardChar.bind(this);
+    this._handleKeyDown = this._handleKeyDown.bind(this);
     this.resetGuess = this.resetGuess.bind(this);
     this.enterGuess = this.enterGuess.bind(this);
     this.deleteChar = this.deleteChar.bind(this);
+  }
+
+  // componentWillMount deprecated in React 16.3
+  componentDidMount(){
+    document.addEventListener("keydown", this._handleKeyDown);
+  }
+
+
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this._handleKeyDown);
   }
 
   getCurrentGuess() {
     return this.state?.guesses ? this.state.guesses[this.state.guessIndex] : "";
   }
 
-  addChar(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-
+  addChar(newChar: string) {
     if (this.getCurrentGuess().length < this.state.maxGuessLength) {
-      const newChar = (e.target as HTMLButtonElement).value;
       this.setState((prevState) => {
         let newGuesses = [...prevState.guesses];
         newGuesses[prevState.guessIndex] += newChar;
@@ -44,7 +54,27 @@ class App extends Component<Props, State> {
     }
   }
 
-  resetGuess(_e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  _handleKeyDown(ev: KeyboardEvent) {
+    const key = ev.key;
+    if (key === "Enter") {
+      this.enterGuess();
+    }
+    else if (key === "Escape") {
+      this.resetGuess();
+    }
+    else if (key === "Backspace") {
+      this.deleteChar();
+    }
+    else if (Alphabet.letterExists(key)) {
+      this.addChar(key);
+    }
+  }
+
+  _handleKeyboardChar(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    this.addChar((e.target as HTMLButtonElement).value);
+  }
+
+  resetGuess(_e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     if (this.getCurrentGuess().length > 0) {
       this.setState(prevState => {
         let newGuesses = [...prevState.guesses];
@@ -54,7 +84,7 @@ class App extends Component<Props, State> {
     }
   }
 
-  enterGuess(_e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  enterGuess(_e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     console.log("TODO: implement enter guess logic");
     if (this.state.guessIndex < this.state.maxGuesses - 1 &&
         this.getCurrentGuess().length === this.state.maxGuessLength) {
@@ -64,7 +94,7 @@ class App extends Component<Props, State> {
     }
   }
 
-  deleteChar(_e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  deleteChar(_e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     if (this.getCurrentGuess().length > 0) {
       this.setState(prevState => {
         let newGuesses = [...prevState.guesses];
@@ -87,7 +117,7 @@ class App extends Component<Props, State> {
           maxGuesses={this.state.maxGuesses}
           maxGuessLength={this.state.maxGuessLength} />
         <Keyboard
-          addChar={this.addChar}
+          addChar={this._handleKeyboardChar}
           resetGuess={this.resetGuess}
           enterGuess={this.enterGuess}
           deleteChar={this.deleteChar} />
