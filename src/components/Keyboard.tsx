@@ -28,13 +28,15 @@ function thirdRow(props: Props) {
 
 
 function Keyboard(props: Props) {
-    return (<div className="keyboard" style={keyboardStyle}>
+    return (<div className="keyboard">
         <div className="letters">
             <div className="row first-row">
                 {firstRow(props)}
             </div>
             <div className="row second-row">
+                <div className="spacer"/>
                 {secondRow(props)}
+                <div className="spacer"/>
             </div>
             <div className="row third-row">
                 <button className="action key" value="backspace" onClick={props.deleteChar}>del</button>
@@ -48,8 +50,3 @@ function Keyboard(props: Props) {
 }
 
 export default Keyboard;
-
-const keyboardStyle = {
-    height: "100%",
-    userSelect: "none" as const,
-}

@@ -1,3 +1,9 @@
+.keyboard {
+    height: 100%;
+    width: 100%;
+    user-select: none;
+}
+
 .row {
     display: flex;
     align-items: center;
@@ -25,4 +31,8 @@
 
 .action {
     text-transform: none;
+}
+
+.spacer {
+    width: .7rem;
 }
